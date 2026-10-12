@@ -1,5 +1,7 @@
 FROM debian:trixie-slim
 
+ARG NEOVIM_VERSION=v0.11.7
+
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         git \
@@ -8,13 +10,24 @@ RUN apt-get update \
         openssh-client \
         build-essential \
         python3 \
+        tar \
         tree-sitter-cli \
         unzip \
         luajit \
-        neovim \
         less \
         ripgrep \
     && rm -rf /var/lib/apt/lists/*
+
+RUN set -eux; \
+    case "$(dpkg --print-architecture)" in \
+        amd64) nvim_arch=x86_64 ;; \
+        arm64) nvim_arch=arm64 ;; \
+        *) echo "Unsupported architecture: $(dpkg --print-architecture)" >&2; exit 1 ;; \
+    esac; \
+    curl -fsSLo /tmp/nvim.tar.gz "https://github.com/neovim/neovim/releases/download/${NEOVIM_VERSION}/nvim-linux-${nvim_arch}.tar.gz"; \
+    tar -xzf /tmp/nvim.tar.gz -C /opt; \
+    ln -s "/opt/nvim-linux-${nvim_arch}/bin/nvim" /usr/local/bin/nvim; \
+    rm /tmp/nvim.tar.gz
 
 RUN curl -fsSL https://opencode.ai/v2/install | bash
 

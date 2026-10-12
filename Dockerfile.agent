@@ -1,0 +1,21 @@
+FROM debian:trixie-slim
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        git \
+        curl \
+        ca-certificates \
+        openssh-client \
+        build-essential \
+        python3 \
+        luajit \
+        neovim \
+        less \
+        ripgrep \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN curl -fsSL https://opencode.ai/v2/install | bash
+
+ENV PATH="/root/.opencode/bin:${PATH}"
+
+WORKDIR /workspace/nvim

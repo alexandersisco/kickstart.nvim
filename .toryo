@@ -1,0 +1,5 @@
+PROJECT_NAME="nvim"
+CONTAINER_REPO="/workspace/nvim"
+GIT_BRANCH="main"
+
+VALIDATE_COMMAND="find . -type f -name '*.lua' -not -path './.git/*' -print0 | xargs -0 -r -n1 sh -c 'luajit -b \"\$0\" /dev/null'"

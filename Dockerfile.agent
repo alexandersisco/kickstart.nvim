@@ -8,6 +8,7 @@ RUN apt-get update \
         openssh-client \
         build-essential \
         python3 \
+        tree-sitter-cli \
         unzip \
         luajit \
         neovim \

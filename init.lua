@@ -1006,6 +1006,7 @@ require('lazy').setup({
   {
     -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
+    branch = 'master', -- Keep the legacy API used below; main requires Neovim 0.12+
     build = ':TSUpdate',
     opts = {
       ensure_installed = {

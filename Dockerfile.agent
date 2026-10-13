@@ -1,6 +1,9 @@
 FROM debian:trixie-slim
 
 ARG NEOVIM_VERSION=v0.11.7
+ARG NODE_VERSION=v22.23.3
+ARG PRETTIER_VERSION=3.9.10
+ARG STYLUA_VERSION=v2.6.0
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
@@ -28,6 +31,29 @@ RUN set -eux; \
     tar -xzf /tmp/nvim.tar.gz -C /opt; \
     ln -s "/opt/nvim-linux-${nvim_arch}/bin/nvim" /usr/local/bin/nvim; \
     rm /tmp/nvim.tar.gz
+
+RUN set -eux; \
+    case "$(dpkg --print-architecture)" in \
+        amd64) node_arch=x64 ;; \
+        arm64) node_arch=arm64 ;; \
+        *) echo "Unsupported architecture: $(dpkg --print-architecture)" >&2; exit 1 ;; \
+    esac; \
+    curl -fsSLo /tmp/node.tar.gz "https://nodejs.org/dist/${NODE_VERSION}/node-${NODE_VERSION}-linux-${node_arch}.tar.gz"; \
+    tar -xzf /tmp/node.tar.gz --strip-components=1 -C /usr/local; \
+    rm /tmp/node.tar.gz
+
+RUN npm install --global "prettier@${PRETTIER_VERSION}"
+
+RUN set -eux; \
+    case "$(dpkg --print-architecture)" in \
+        amd64) stylua_arch=x86_64 ;; \
+        arm64) stylua_arch=aarch64 ;; \
+        *) echo "Unsupported architecture: $(dpkg --print-architecture)" >&2; exit 1 ;; \
+    esac; \
+    curl -fsSLo /tmp/stylua.zip "https://github.com/JohnnyMorganz/StyLua/releases/download/${STYLUA_VERSION}/stylua-linux-${stylua_arch}.zip"; \
+    unzip -q /tmp/stylua.zip -d /usr/local/bin; \
+    chmod +x /usr/local/bin/stylua; \
+    rm /tmp/stylua.zip
 
 RUN curl -fsSL https://opencode.ai/v2/install | bash
 

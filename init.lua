@@ -93,6 +93,10 @@ vim.g.maplocalleader = ' '
 -- Set to true if you have a Nerd Font installed and selected in the terminal
 vim.g.have_nerd_font = true
 
+-- Use Rose Pine on ARM machines and Tokyo Night on other architectures.
+local machine_arch = (vim.uv or vim.loop).os_uname().machine:lower()
+local use_rose_pine = machine_arch:match('^arm') ~= nil or machine_arch == 'aarch64'
+
 -- [[ Setting options ]]
 -- See `:help vim.opt`
 -- NOTE: You can change these options as you wish!
@@ -933,19 +937,24 @@ require('lazy').setup({
     end,
   },
 
-  { -- You can easily change to a different colorscheme.
-    -- Change the name of the colorscheme plugin below, and then
-    -- change the command in the config to whatever the name of that colorscheme is.
-    --
-    -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
+  { -- Rose Pine is used on ARM architectures.
     'rose-pine/neovim',
     name = 'rose-pine',
+    enabled = use_rose_pine,
     priority = 1000, -- Make sure to load this before all the other start plugins.
     init = function()
-      -- Load the colorscheme here. Other variants include 'rose-pine-moon' and 'rose-pine-dawn'.
       vim.cmd.colorscheme 'rose-pine'
 
       -- You can configure highlights by doing something like:
+      vim.cmd.hi 'Comment gui=none'
+    end,
+  },
+  { -- Tokyo Night is used on non-ARM architectures.
+    'folke/tokyonight.nvim',
+    enabled = not use_rose_pine,
+    priority = 1000,
+    init = function()
+      vim.cmd.colorscheme 'tokyonight-night'
       vim.cmd.hi 'Comment gui=none'
     end,
   },
